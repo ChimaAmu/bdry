@@ -11,6 +11,13 @@ usage() {
 case $1 in 
     -a | -add )
         shift;
+        today="$(date +%Y%m%d)"
+        if [ ! -f "$today" ] ;
+        then
+            touch "$today"
+            date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$today"
+            echo "------------------------------" >> "$today"
+        fi
         echo "$(date +%T)" "$@" >> "$(date +%Y%m%d)"
         exit 0
         ;;
@@ -19,7 +26,11 @@ case $1 in
         exit 0
         ;;
     -p | -print )
-        cat -n "$(date +%Y%m%d)"
+        if [ "$2" = "number" ] || [ "$2" = "num" ] || [ "$2" = "n" ]; then
+            cat -n "$(date +%Y%m%d)"
+            exit 0
+        fi
+        cat "$(date +%Y%m%d)"
         exit 0
         ;;
     -h | * )
