@@ -6,8 +6,9 @@ usage() {
        $(basename "$0") -d {line} to delete line
        $(basename "$0") -p to print current day entry
                   'n', 'num', or 'number' afterwards prints line numbers
-       $(basename "$0") -p to print current day entry
-       "
+       $(basename "$0") -e to edit entire current day entry file
+                  start with line number to edit only the specified line
+                  e.g. '1 hlelo hello'"
     exit 0
 }
 
@@ -34,6 +35,16 @@ case $1 in
             exit 0
         fi
         cat "$today"
+        exit 0
+        ;;
+    -e | -edit ) 
+        if [ "$#" -eq 4 ] ; then
+            sed -i "$2"s/"$3"/"$4"/ "$today"
+            sed -i "$2"s/$/" (edited at $(date +%T))"/ "$today"
+            exit 0
+        fi
+        sed -i s/"$2"/"$3"/ "$today"
+        echo "(edited file at $(date +%T))" >> "$today"
         exit 0
         ;;
     -h | * )
