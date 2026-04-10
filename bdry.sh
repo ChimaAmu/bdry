@@ -4,7 +4,10 @@
 usage() {
     echo "Usage: $(basename "$0") -a {data} to add to current day
        $(basename "$0") -d {line} to delete line
-       $(basename "$0") -p to print current day entry"
+       $(basename "$0") -p to print current day entry
+                  'n', 'num', or 'number' afterwards prints line numbers
+       $(basename "$0") -p to print current day entry
+       "
     exit 0
 }
 
