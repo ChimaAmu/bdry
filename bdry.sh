@@ -12,15 +12,31 @@ usage() {
     exit 0
 }
 
-today="$(date +%Y%m%d)"
+newentry="$(date +%Y%m%d)"
+today="$(find . -name "$newentry")"
 case $1 in 
     -a | -add )
         shift;
-        if [ ! -f "$today" ] ;
+        if [ ! -f "$newentry" ] ;
         then
-            touch "$today"
-            date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$today"
-            echo "------------------------------" >> "$today"
+            touch "$newentry"
+            date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newentry"
+            echo "------------------------------" >> "$newentry"
+
+            # If no current directory "Year"
+            if [ ! -d "$(date +%Y)" ] ;
+            then
+                mkdir "$(date +%Y)"
+            fi
+
+            # If no current directory "Year/Month"
+            if [ ! -d "$(date +%Y)"/"$(date +%m)" ] ;
+            then
+                mkdir "$(date +%Y)"/"$(date +%m)"
+            fi
+
+            # Move new entry to directory "Year/Month"
+            mv "$newentry" "$(date +%Y)"/"$(date +%m)"
         fi
         echo "$(date +%T)" "$@" >> "$today"
         exit 0
@@ -30,8 +46,8 @@ case $1 in
         exit 0
         ;;
     -p | -print )
-        if [ -f "$3" ]; then
-            today="$3"
+        if [ -f "$(find . -name "$3")" ]; then
+            today="$(find . -name "$3")"
         fi
         if [ "$2" = "number" ] || [ "$2" = "num" ] || [ "$2" = "n" ]; then
             cat -n "$today"
