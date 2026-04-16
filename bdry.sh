@@ -4,6 +4,7 @@
 usage() {
     echo "Usage: $(basename "$0") -a {data} to add to current day
        $(basename "$0") -d {line} to delete line
+       $(basename "$0") -rm to delete file
        $(basename "$0") -p {date} to print entry (default is the current day)
                   'n', 'num', or 'number' afterwards prints line numbers
        $(basename "$0") -e to edit entire current day entry file
@@ -14,35 +15,53 @@ usage() {
 
 newentry="$(date +%Y%m%d)"
 today="$(find . -name "$newentry")"
+
+makeNewEntry() {
+    touch "$newentry"
+    date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newentry"
+    echo "------------------------------" >> "$newentry"
+
+    # If no current directory "Year"
+    if [ ! -d "$(date +%Y)" ] ;
+    then
+        mkdir "$(date +%Y)"
+    fi
+
+    # If no current directory "Year/Month"
+    if [ ! -d "$(date +%Y)"/"$(date +%m)" ] ;
+    then
+        mkdir "$(date +%Y)"/"$(date +%m)"
+    fi
+
+    # Move new entry to directory "Year/Month"
+    mv "$newentry" "$(date +%Y)"/"$(date +%m)"
+}
+
 case $1 in 
     -a | -add )
         shift;
-        if [ ! -f "$newentry" ] ;
+        # current day file does not exist
+        if [ ! -f "$today" ] ;
         then
-            touch "$newentry"
-            date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newentry"
-            echo "------------------------------" >> "$newentry"
-
-            # If no current directory "Year"
-            if [ ! -d "$(date +%Y)" ] ;
-            then
-                mkdir "$(date +%Y)"
-            fi
-
-            # If no current directory "Year/Month"
-            if [ ! -d "$(date +%Y)"/"$(date +%m)" ] ;
-            then
-                mkdir "$(date +%Y)"/"$(date +%m)"
-            fi
-
-            # Move new entry to directory "Year/Month"
-            mv "$newentry" "$(date +%Y)"/"$(date +%m)"
+            makeNewEntry
         fi
-        echo "$(date +%T)" "$@" >> "$today"
-        exit 0
+        # current file does not exist, and there are no words to be added
+        if [ ! "$#" -gt 0 ] && [ ! -f "$today" ] ; then
+            makeNewEntry
+            exit 0
+        fi
+        # current entry file exists and there are words after -a
+        if [ "$#" -gt 0 ] ; then
+            echo "$(date +%T)" "$@" >> "$today"
+            exit 0
+        fi
         ;;
     -d | -delete )
         sed -i "$2"'d' "$today"
+        exit 0
+        ;;
+    -rm | -remove )
+        rm "$today"
         exit 0
         ;;
     -p | -print )
