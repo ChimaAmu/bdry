@@ -1,6 +1,8 @@
 #!/bin/bash
 # Adds specified information into a time-formatted diary entry
 
+source ./settings
+
 usage() {
     echo "Usage: $(basename "$0") -a {data} to add to current day
        $(basename "$0") -d {line} to delete line
@@ -13,28 +15,28 @@ usage() {
     exit 0
 }
 
-newentry="$(date +%Y%m%d)"
-today="$(find . -name "$newentry")"
+newEntry="$(date +%Y%m%d)"
+today="$(find "$mainFolder" -name "$newEntry")"
 
 makeNewEntry() {
-    touch "$newentry"
-    date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newentry"
-    echo "------------------------------" >> "$newentry"
+    touch "$newEntry"
+    date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newEntry"
+    echo "------------------------------" >> "$newEntry"
 
     # If no current directory "Year"
-    if [ ! -d "$(date +%Y)" ] ;
+    if [ ! -d "$mainFolder"/"$(date +%Y)" ] ;
     then
-        mkdir "$(date +%Y)"
+        mkdir "$mainFolder"/"$(date +%Y)"
     fi
 
     # If no current directory "Year/Month"
-    if [ ! -d "$(date +%Y)"/"$(date +%m)" ] ;
+    if [ ! -d "$mainFolder"/"$(date +%Y)"/"$(date +%m)" ] ;
     then
-        mkdir "$(date +%Y)"/"$(date +%m)"
+        mkdir "$mainFolder"/"$(date +%Y)"/"$(date +%m)"
     fi
 
     # Move new entry to directory "Year/Month"
-    mv "$newentry" "$(date +%Y)"/"$(date +%m)"
+    mv "$newEntry" "$mainFolder"/"$(date +%Y)"/"$(date +%m)"
 }
 
 case $1 in 
@@ -65,8 +67,8 @@ case $1 in
         exit 0
         ;;
     -p | -print )
-        if [ -f "$(find . -name "$3")" ]; then
-            today="$(find . -name "$3")"
+        if [ -f "$(find "$mainFolder" -name "$3")" ]; then
+            today="$(find "$mainFolder" -name "$3")"
         fi
         if [ "$2" = "number" ] || [ "$2" = "num" ] || [ "$2" = "n" ]; then
             cat -n "$today"
@@ -77,12 +79,12 @@ case $1 in
         ;;
     -e | -edit ) 
         if [ "$#" -gt 4 ] ; then
-            echo "Incorrect usage" >&2
+            echo "Incorrect usage." >&2
             exit 1
         fi
         if [ "$#" -eq 4 ] ; then
             if [[ ! "$3" =~ $(sed -n "$2"'{p;q}' "$today" | "$@") ]]; then
-                echo "Word not found in line" >&2
+                echo "Word not found in line." >&2
                 exit 1
             fi
             sed -i "$2"s/"$3"/"$4"/ "$today"
@@ -90,11 +92,25 @@ case $1 in
             exit 0
         fi
         if [[ ! "$2" =~ $("$@" < "$today") ]]; then
-            echo "Word not found in file" >&2
+            echo "Word not found in file." >&2
             exit 1
         fi
         sed -i s/"$2"/"$3"/ "$today"
         echo "(edited file at $(date +%T))" >> "$today"
+        exit 0
+        ;;
+    -s | -setup )
+        shift;
+        if [ $# -gt 1 ]; then
+            echo "Set one folder to store entries." >&2
+            exit 1
+        fi
+        if [ ! -d "$1" ]; then
+            echo "Directory does not exist." >&2
+            exit 1
+        fi
+        # Set main folder
+        sed -i 3s/.*/export\ mainFolder="$1"/ ./setFolder
         exit 0
         ;;
     * )

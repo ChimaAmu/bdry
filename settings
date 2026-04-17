@@ -1,0 +1,3 @@
+#!/bin/bash
+# Main folder to store files
+export mainFolder=hello
