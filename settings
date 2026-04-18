@@ -1,3 +1,15 @@
 #!/bin/bash
 # Main folder to store files
-export mainFolder=hello
+export mainFolder=bdry-files
+
+# Shortcuts
+export @ytd="$(date -d "1 day ago" %Y%m%d)"
+export @yesterday="$(date -d "1 day ago" %Y%m%d)"
+
+export @lastweek="$(date -d "1 week ago" %Y%m%d)"
+export @twoweeks="$(date -d "2 weeks ago" %Y%m%d)"
+export @threeweeks="$(date -d "3 weeks ago" %Y%m%d)"
+
+export @lastmonth="$(date -d "1 month ago" %Y%m%d)"
+
+export @lastyear="$(date -d "1 year ago" %Y%m%d)"

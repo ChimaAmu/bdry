@@ -1,7 +1,11 @@
 #!/bin/bash
 # Adds specified information into a time-formatted diary entry
 
-source ./settings
+source settings
+mkdir "$mainFolder"
+
+newEntry="$(date +%Y%m%d)"
+today="$(find "$mainFolder" -name "$newEntry")"
 
 usage() {
     echo "Usage: $(basename "$0") -a {data} to add to current day
@@ -14,9 +18,6 @@ usage() {
                   e.g. '1 hlelo hello'"
     exit 0
 }
-
-newEntry="$(date +%Y%m%d)"
-today="$(find "$mainFolder" -name "$newEntry")"
 
 makeNewEntry() {
     touch "$newEntry"
@@ -37,6 +38,11 @@ makeNewEntry() {
 
     # Move new entry to directory "Year/Month"
     mv "$newEntry" "$mainFolder"/"$(date +%Y)"/"$(date +%m)"
+}
+
+# Expand @shortcuts if present in settings
+expandShortcuts() {
+    exit 0
 }
 
 case $1 in 
