@@ -1,19 +1,25 @@
 #!/bin/bash
 # Main folder to store files
 
-export main_folder=bdry-files
+main_folder="bdry-files"
+export main_folder
 
 # Shortcuts
 declare -A shortcuts=(
-[@ytd]="$(date -d "1 day ago" +%Y%m%d)"
-[@yesterday]="$(date -d "1 day ago" +%Y%m%d)"
+[ytd]="$(date -d "1 day ago" +%Y%m%d)"
+[yesterday]="$(date -d "1 day ago" +%Y%m%d)"
 
-[@lastweek]="$(date -d "1 week ago" +%Y%m%d)"
-[@twoweeks]="$(date -d "2 weeks ago" +%Y%m%d)"
-[@threeweeks]="$(date -d "3 weeks ago" +%Y%m%d)"
+[lastweek]="$(date -d "1 week ago" +%Y%m%d)"
+[twoweeks]="$(date -d "2 weeks ago" +%Y%m%d)"
+[threeweeks]="$(date -d "3 weeks ago" +%Y%m%d)"
 
-[@lastmonth]="$(date -d "1 month ago" +%Y%m%d)"
+[lastmonth]="$(date -d "1 month ago" +%Y%m%d)"
 
-[@lastyear]="$(date -d "1 year ago" +%Y%m%d)"
+[lastyear]="$(date -d "1 year ago" +%Y%m%d)"
+
+[rd]="start reading"
+[eat]="start eating"
+[ws]="watch show"
+[wm]="watch movie"
 )
 export shortcuts

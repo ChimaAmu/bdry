@@ -1,8 +1,8 @@
 #!/bin/bash
 # Adds specified information into a time-formatted diary entry
 
-source settings
-source template
+source ./settings
+source ./template
 if [ ! -d "$main_folder" ] ; then
     mkdir "$main_folder"
 fi
@@ -24,7 +24,7 @@ usage() {
 
 make_new_entry() {
     touch "$new_entry"
-    $template_file | sed s/_/\ /g > "$new_entry"
+    echo "${template_file//_/\ }" > "$new_entry"
     echo "------------------------------" >> "$new_entry"
 
     # If no current directory "Year"
@@ -41,24 +41,15 @@ make_new_entry() {
 
     # Move new entry to directory "Year/Month"
     mv "$new_entry" "$main_folder"/"$(date +%Y)"/"$(date +%m)"
-}
-
-# Expand @shortcuts if present in settings
-expand_shortcuts() {
-    # [[ ${shortcuts[*]} =~ $1 ]] && echo "${shortcuts[]}" || echo "false"
-    if [ "${str:0:1}" == "@" ] ; then
-        str="${shortcuts[$str]}" || echo "Shortcut not assigned in settings"
-    fi
+    today="$(find "$main_folder" -name "$new_entry")"
 }
 
 case $1 in 
     -a | -add )
         shift;
-        expand_shortcuts "$1"
-        # current file does not exist, and there are no words to be added
-        if [ ! -f "$today" ] && [ ! "$#" -gt 0 ] ; then
-            make_new_entry
-            exit 0
+        # Expand @shortcuts if present in settings
+        if [ "${1:0:1}" == "@" ] ; then
+            set -- "${shortcuts["${1:1}"]}"
         fi
         # current day file does not exist
         if [ ! -f "$today" ] ;
@@ -68,8 +59,8 @@ case $1 in
         # current entry file exists and there are words after -a
         if [ "$#" -gt 0 ] ; then
             echo "$(date +%T)" "$@" >> "$today"
-            exit 0
         fi
+        exit 0
         ;;
     -d | -delete )
         sed -i "$2"'d' "$today"
