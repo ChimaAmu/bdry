@@ -2,10 +2,13 @@
 # Adds specified information into a time-formatted diary entry
 
 source settings
-mkdir "$mainFolder"
+source template
+if [ ! -d "$main_folder" ] ; then
+    mkdir "$main_folder"
+fi
 
-newEntry="$(date +%Y%m%d)"
-today="$(find "$mainFolder" -name "$newEntry")"
+new_entry="$(date +%Y%m%d)"
+today="$(find "$main_folder" -name "$new_entry")"
 
 usage() {
     echo "Usage: $(basename "$0") -a {data} to add to current day
@@ -19,44 +22,48 @@ usage() {
     exit 0
 }
 
-makeNewEntry() {
-    touch "$newEntry"
-    date +%A,_%dth_%B_%Y | sed s/_/\ /g > "$newEntry"
-    echo "------------------------------" >> "$newEntry"
+make_new_entry() {
+    touch "$new_entry"
+    $template_file | sed s/_/\ /g > "$new_entry"
+    echo "------------------------------" >> "$new_entry"
 
     # If no current directory "Year"
-    if [ ! -d "$mainFolder"/"$(date +%Y)" ] ;
+    if [ ! -d "$main_folder"/"$(date +%Y)" ] ;
     then
-        mkdir "$mainFolder"/"$(date +%Y)"
+        mkdir "$main_folder"/"$(date +%Y)"
     fi
 
     # If no current directory "Year/Month"
-    if [ ! -d "$mainFolder"/"$(date +%Y)"/"$(date +%m)" ] ;
+    if [ ! -d "$main_folder"/"$(date +%Y)"/"$(date +%m)" ] ;
     then
-        mkdir "$mainFolder"/"$(date +%Y)"/"$(date +%m)"
+        mkdir "$main_folder"/"$(date +%Y)"/"$(date +%m)"
     fi
 
     # Move new entry to directory "Year/Month"
-    mv "$newEntry" "$mainFolder"/"$(date +%Y)"/"$(date +%m)"
+    mv "$new_entry" "$main_folder"/"$(date +%Y)"/"$(date +%m)"
 }
 
 # Expand @shortcuts if present in settings
-expandShortcuts() {
-    exit 0
+expand_shortcuts() {
+    # [[ ${shortcuts[*]} =~ $1 ]] && echo "${shortcuts[]}" || echo "false"
+    if [ "${str:0:1}" == "@" ] ; then
+        str="${shortcuts[$str]}" || echo "Shortcut not assigned in settings"
+    fi
 }
 
 case $1 in 
     -a | -add )
         shift;
+        expand_shortcuts "$1"
         # current file does not exist, and there are no words to be added
         if [ ! -f "$today" ] && [ ! "$#" -gt 0 ] ; then
-            makeNewEntry
+            make_new_entry
             exit 0
         fi
         # current day file does not exist
         if [ ! -f "$today" ] ;
         then
-            makeNewEntry
+            make_new_entry
         fi
         # current entry file exists and there are words after -a
         if [ "$#" -gt 0 ] ; then
@@ -73,8 +80,8 @@ case $1 in
         exit 0
         ;;
     -p | -print )
-        if [ -f "$(find "$mainFolder" -name "$3")" ]; then
-            today="$(find "$mainFolder" -name "$3")"
+        if [ -f "$(find "$main_folder" -name "$3")" ]; then
+            today="$(find "$main_folder" -name "$3")"
         fi
         if [ "$2" = "number" ] || [ "$2" = "num" ] || [ "$2" = "n" ]; then
             cat -n "$today"
@@ -116,7 +123,7 @@ case $1 in
             exit 1
         fi
         # Set main folder
-        sed -i 3s/.*/export\ mainFolder="$1"/ ./setFolder
+        sed -i 3s/.*/export\ main_folder="$1"/ ./settings
         exit 0
         ;;
     * )

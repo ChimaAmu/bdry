@@ -1,0 +1,6 @@
+#!/bin/bash
+# Template file to format your notes
+
+#                    day date month year
+template_file=$(date +%A,_%dth_%B_%Y)
+export template_file
