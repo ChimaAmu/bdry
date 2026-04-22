@@ -18,7 +18,8 @@ usage() {
                   'n', 'num', or 'number' afterwards prints line numbers
        $(basename "$0") -e to edit entire current day entry file
                   start with line number to edit only the specified line
-                  e.g. '1 hlelo hello'"
+                  e.g. '1 hlelo hello'
+       $(basename "$0") -s to search through all entries"
     exit 0
 }
 
@@ -118,11 +119,13 @@ case $1 in
         ;;
     -s | -search )
         shift;
-        grep -r \
-        "$(if [ "$1" == "c" ]; then 
-            echo -c 
-        fi)"
-        "$@" "$main_folder"
+        search="grep -r"
+        with_count="-c"
+        if [[ "$1" =~ [c|count] ]]; then 
+            search="${search} ${with_count}"
+            shift;
+        fi
+        $search "$@" "$main_folder"
         exit 0
         ;;
     * )
