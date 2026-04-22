@@ -5,7 +5,7 @@ This is a simple diary for those of us who spend probably too much time in the t
 * -d {line} to delete the specified line
 * -p to print entry of specified date (current if not specified)
 * -e {old} {new} replace words in entries
-* -s {folder} to choose the folder to save entries (default is current folder)
+* -s {count} to search through all files in the folder
 
 ## Features
 * Dates are auto-sorted into Year/Month folders
